@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Digit Grid Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 200px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .grid {
+      display: inline-block;
+      margin: 20px 40px 20px 0;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    td {
+      border: 1px solid #333;
+      padding: 6px 12px;
+      text-align: center;
+      background: #fff;
+      font-weight: bold;
+    }
+    .block-separator {
+      height: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Digit Grid Generator</h1>
+  <input type="text" id="digitInput" maxlength="10" placeholder="Enter 10 digits">
+  <button onclick="generateGrids()">Generate</button>
+
+  <div class="grid">
+    <h2>Left Grid (3 × 10)</h2>
+    <div id="leftGrid"></div>
+  </div>
+
+  <div class="grid">
+    <h2>Right Grid (Blocks)</h2>
+    <div id="rightGrid"></div>
+  </div>
+
+  <script>
+    let leftMatrix = [];
+    let rightMatrix = [];
+
+    // Render a matrix inside a container
+    function renderGrid(containerId, matrix, separateBlocks=false, blockSize=8) {
+      let html = "<table>";
+      matrix.forEach((row, i) => {
+        if (separateBlocks && i % blockSize === 0 && i > 0) {
+          html += `<tr class="block-separator"><td colspan="${row.length}"></td></tr>`;
+        }
+        html += "<tr>" + row.map(v => `<td>${v}</td>`).join("") + "</tr>";
+      });
+      html += "</table>";
+      document.getElementById(containerId).innerHTML = html;
+    }
+
+    function generateGrids() {
+      const input = document.getElementById("digitInput").value.trim();
+
+      if (!/^\d{10}$/.test(input)) {
+        alert("Please enter exactly 10 digits.");
+        return;
+      }
+
+      // ===== LEFT GRID =====
+      leftMatrix = [];
+      for (let i = 0; i < 10; i++) {
+        let row = [];
+        for (let j = 0; j < 3; j++) {
+          let idx = (i + j) % input.length;
+          let pair = input[idx] + input[(idx + 1) % input.length];
+          row.push(pair);
+        }
+        leftMatrix.push(row);
+      }
+      renderGrid("leftGrid", leftMatrix);
+
+      // ===== RIGHT GRID =====
+      rightMatrix = [];
+
+      for (let r=0; r<leftMatrix.length-1; r++) {
+        let row1 = leftMatrix[r];
+        let row2 = leftMatrix[r+1];
+        let block = [];
+
+        block.push([row1[0] + row2[0][0], row1[1] + row2[1][0], row1[2] + row2[2][0]]);
+        block.push([row2[0] + row1[0][0], row2[1] + row1[1][0], row2[2] + row1[2][0]]);
+        block.push([row1[0] + row2[0][1], row1[1] + row2[1][1], row1[2] + row2[2][1]]);
+        block.push([row2[0] + row1[0][1], row2[1] + row1[1][1], row2[2] + row1[2][1]]);
+        block.push([row2[0] + row1[0], row2[1] + row1[1], row2[2] + row1[2]]);
+        block.push([row1[0] + row2[0], row1[1] + row2[1], row1[2] + row2[2]]);
+        block.push([
+          row2[0] + row1[0].split("").reverse().join(""),
+          row2[1] + row1[1].split("").reverse().join(""),
+          row2[2] + row1[2].split("").reverse().join("")
+        ]);
+        block.push([
+          row1[0] + row2[0].split("").reverse().join(""),
+          row1[1] + row2[1].split("").reverse().join(""),
+          row1[2] + row2[2].split("").reverse().join("")
+        ]);
+
+        rightMatrix = rightMatrix.concat(block);
+      }
+
+      renderGrid("rightGrid", rightMatrix, true, 8);
+    }
+  </script>
+</body>
+</html>

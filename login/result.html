@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permutation Grid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      grid-template-rows: repeat(10, 60px);
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .empty {
+      background: #f0f0f0;
+      border: 1px dashed #ccc;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="leftGrid" class="grid"></div>
+
+  <div class="buttons">
+    <button onclick="prevPermutation()">Previous</button>
+    <button onclick="nextPermutation()">Next</button>
+    <button onclick="goBack()">Go Back</button>
+  </div>
+
+<script>
+/* ---------- Core logic ---------- */
+
+/**
+ * Generate the 10-step sequence exactly as in your example:
+ * take the last digit and insert it progressively one position left each step.
+ * Example for 1234056789 -> steps where last digit '9' moves leftwards.
+ */
+function generateFixedSequence(numStr) {
+  const n = numStr.length;
+  const original = numStr.split('');
+  const last = original[n-1];
+  const withoutLast = original.slice(0, n-1); // 0..n-2
+  const results = [];
+
+  // i=0 => insert at index n-1 (append) -> original
+  // i=1 => insert at index n-2 -> last moves left one
+  // ...
+  // i=n-1 => insert at index 0 -> last moves to front
+  for (let i = 0; i < n; i++) {
+    const insertIndex = (n - 1) - i;
+    const arr = withoutLast.slice(); // copy of first n-1 elements
+    arr.splice(insertIndex, 0, last);
+    results.push(arr.join(''));
+  }
+  return results; // length n (10)
+}
+
+/**
+ * Split a 10-digit string into 2-digit pairs:
+ * "1234056789" => ["12","34","05","67","89"]
+ */
+function splitIntoPairs(s) {
+  const pairs = [];
+  for (let i = 0; i < s.length; i += 2) pairs.push(s.substring(i, i+2));
+  return pairs;
+}
+
+/* ---------- UI & Paging ---------- */
+
+let allPairs = [];    // array of pairs from the 10-step sequence (up to 50 pairs)
+let currentPage = 0;  // 0 => first 30 pairs shown
+const pageSize = 30;  // 3 x 10
+
+function start() {
+  const input = document.getElementById('numInput').value.trim();
+  if (!/^\d{10}$/.test(input)) {
+    alert('Please enter exactly 10 digits (0-9).');
+    return;
+  }
+
+  // generate 10-step sequence + all pairs
+  const seq = generateFixedSequence(input);
+  allPairs = [];
+  seq.forEach(item => {
+    allPairs = allPairs.concat(splitIntoPairs(item));
+  });
+
+  currentPage = 0;
+  renderPage();
+}
+
+function renderPage() {
+  const gridContainer = document.getElementById('gridContainer');
+  gridContainer.innerHTML = ''; // clear
+
+  // determine page slice
+  const startIdx = currentPage * pageSize;
+  const pagePairs = allPairs.slice(startIdx, startIdx + pageSize);
+
+  // build grid (always 3x10 cells; empty strings if not enough pairs)
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 3; c++) {
+      const idx = r * 3 + c;
+      const value = pagePairs[idx] || '';
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = value;
+      grid.appendChild(cell);
+    }
+  }
+
+  gridContainer.appendChild(grid);
+  renderPager();
+}
+
+function renderPager() {
+  const pager = document.getElementById('pager');
+  pager.innerHTML = '';
+
+  // Previous
+  const prev = document.createElement('button');
+  prev.className = 'btn-nav';
+  prev.textContent = '⬅ Previous';
+  prev.disabled = currentPage === 0;
+  prev.onclick = () => { if (currentPage>0) { currentPage--; renderPage(); } };
+  pager.appendChild(prev);
+
+  // Page info
+  const info = document.createElement('span');
+  info.style.margin = '0 12px';
+  const totalPages = Math.max(1, Math.ceil(allPairs.length / pageSize));
+  info.textContent = ` Page ${currentPage+1} / ${totalPages} `;
+  pager.appendChild(info);
+
+  // Next
+  const next = document.createElement('button');
+  next.className = 'btn-nav';
+  next.textContent = 'Next ➡';
+  next.disabled = (currentPage+1) * pageSize >= allPairs.length;
+  next.onclick = () => { if ((currentPage+1)*pageSize < allPairs.length) { currentPage++; renderPage(); } };
+  pager.appendChild(next);
+}
+
+function resetAll() {
+  document.getElementById('numInput').value = '';
+  document.getElementById('gridContainer').innerHTML = '';
+  document.getElementById('pager').innerHTML = '';
+  allPairs = [];
+  currentPage = 0;
+}
+
+/* If you want the example prefilled, uncomment the next line to auto-run on page load:
+   start();
+*/
+</script>
+
+</body>
+</html>

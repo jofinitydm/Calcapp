@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Permutation Grid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      grid-template-rows: repeat(10, 60px);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .cell {
+      border: 2px solid #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      background: #f8f8f8;
+      border-radius: 6px;
+    }
+    .buttons {
+      display: flex;
+      gap: 15px;
+    }
+    button {
+      padding: 8px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+    }
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Permutation Viewer</h2>
+  <div class="grid" id="grid"></div>
+
+  <div class="buttons">
+    <button id="prev">Previous</button>
+    <button id="next">Next</button>
+  </div>
+
+  <script>
+    const sequences = [
+      "1234056789",
+      "1234056798",
+      "1234056978",
+      "1234059678",
+      "1234095678",
+      "1234905678",
+      "1239405678",
+      "1293405678",
+      "1923405678",
+      "9123405678"
+    ];
+
+    let currentIndex = 0;
+    const grid = document.getElementById("grid");
+
+    // Create 30 cells (3x10 grid)
+    for (let i = 0; i < 30; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      grid.appendChild(cell);
+    }
+
+    function displaySequence(index) {
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => cell.textContent = ""); // clear
+
+      const seq = sequences[index];
+      const pairs = seq.match(/.{1,2}/g); // split into 2-digit chunks
+
+      for (let i = 0; i < pairs.length; i++) {
+        cells[i].textContent = pairs[i];
+      }
+    }
+
+    document.getElementById("prev").addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        displaySequence(currentIndex);
+      }
+    });
+
+    document.getElementById("next").addEventListener("click", () => {
+      if (currentIndex < sequences.length - 1) {
+        currentIndex++;
+        displaySequence(currentIndex);
+      }
+    });
+
+    // Initial display
+    displaySequence(currentIndex);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merged Result Grid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      grid-template-rows: repeat(10, 60px);
+      gap: 5px;
+    }
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <div id="leftGrid" class="grid"></div>
+
+    <center>
+      <button onclick="goBack()">Go Back</button>
+    </center>
+  </div>
+
+<script>
+  window.onload = function() {
+    let mergedValue = localStorage.getItem("mergedValue") || "";
+
+    // Break into chunks of 2 digits
+    let chunks = mergedValue.match(/.{1,2}/g) || [];
+
+    // Fill only left grid (3x10)
+    fillGrid("leftGrid", chunks);
+  }
+
+  function fillGrid(gridId, values) {
+    let grid = document.getElementById(gridId);
+    values.forEach(val => {
+      let cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = val;
+      grid.appendChild(cell);
+    });
+  }
+
+  function goBack() {
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merged Result</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f8f8f8;
+    }
+    .container {
+      background: #fff;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Merged Value</h2>
+    <h3 id="merged"></h3>
+    <br>
+    <button onclick="goBack()">Go Back</button>
+  </div>
+
+<script>
+  window.onload = function() {
+    let mergedValue = localStorage.getItem("mergedValue") || "";
+    document.getElementById("merged").innerText = mergedValue;
+  }
+
+  function goBack() {
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html> -->

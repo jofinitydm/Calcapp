@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maths App Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    h2 { margin-bottom: 30px; }
+    input { width: 80%; padding: 10px; margin: 10px 0; font-size: 18px; text-align: center; }
+    .btn { padding: 12px 20px; font-size: 18px; margin: 10px; cursor: pointer; border: none; }
+    .blue { background: blue; color: white; }
+    .red { background: red; color: white; }
+  </style>
+</head>
+<body>
+
+  <h2>Maths App Calculator</h2>
+
+  <!-- Input Number -->
+  <input type="text" id="inputNumber" placeholder="Enter your number" maxlength="10" oninput="updateBalance()">
+
+  <br>+
+
+  <!-- Balance Number -->
+  <input type="text" id="balanceNumber" readonly>
+
+  <br><br>
+
+  <button class="btn blue" onclick="goToResult()">Submit</button>
+  <button class="btn red" onclick="resetFields()">Clear</button>
+
+  <script>
+    function updateBalance() {
+      let input = document.getElementById("inputNumber").value;
+      let allDigits = "0123456789".split("");
+      let entered = input.split("");
+
+      // remove duplicates
+      let uniqueInput = [...new Set(entered)].join("");
+      if (uniqueInput !== input) {
+        document.getElementById("inputNumber").value = uniqueInput;
+      }
+
+      allDigits = allDigits.filter(d => !uniqueInput.includes(d));
+      document.getElementById("balanceNumber").value = allDigits.join("");
+    }
+
+    function goToResult() {
+      let input = document.getElementById("inputNumber").value;
+      let balance = document.getElementById("balanceNumber").value;
+      let merged = input + balance;
+
+      if (merged.length !== 10) {
+        alert("Please enter valid digits (no repeats)!");
+        return;
+      }
+
+      // redirect to result page with merged number
+      window.location.href = "result.html?value=" + merged;
+    }
+
+    function resetFields() {
+      document.getElementById("inputNumber").value = "";
+      document.getElementById("balanceNumber").value = "";
+    }
+  </script>
+
+</body>
+</html>

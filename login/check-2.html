@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Maths App Calculator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; text-align:center; margin:24px; }
+    h1 { margin-bottom:12px; }
+    input { font-size:18px; padding:8px; width:220px; text-align:center; }
+    button { margin:8px; padding:10px 16px; font-size:16px; border-radius:6px; border:0; cursor:pointer; }
+    .btn-submit { background:#3b66ff; color:#fff; }
+    .btn-reset { background:#e74c3c; color:#fff; }
+    .grid { display:grid; grid-template-columns:repeat(3,90px); grid-auto-rows:54px; gap:8px;
+            margin:auto; margin-top:18px; border:2px solid #333; padding:12px; width:max-content; }
+    .cell { display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px;
+            border:1px solid #666; border-radius:4px; }
+    .pager { margin-top:12px; }
+    .btn-nav { background:#1abc9c; color:#fff; }
+  </style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div id="page1">
+  <h1>Maths App Calculator</h1>
+  <p>Enter starting digits (no duplicates):</p>
+  <input id="startInput" maxlength="10" placeholder="Enter digits like 1234" />
+  <div>
+    <button class="btn-submit" onclick="prepareNumber()">Submit</button>
+    <button class="btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+  <p id="balanceDigits"></p>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2" style="display:none;">
+  <h1>3×10 Matrix Result</h1>
+  <p>Merged 10-digit number:</p>
+  <h2 id="mergedNumber"></h2>
+  <div id="gridContainer"></div>
+  <div id="pager" class="pager"></div>
+  <button class="btn-reset" onclick="goBack()">⬅ Back</button>
+</div>
+
+<script>
+let allPairs = [];
+let currentPage = 0;
+const pageSize = 30;
+let merged = "";
+
+/* Step 1: Prepare full number */
+function prepareNumber() {
+  const input = document.getElementById("startInput").value.trim();
+  if (!/^\d+$/.test(input)) { alert("Please enter digits only."); return; }
+  const used = new Set(input.split(""));
+  if (used.size !== input.length) { alert("No duplicate digits allowed."); return; }
+
+  // balance digits (0-9 not in input)
+  let balance = "";
+  for (let d=0; d<=9; d++) if (!used.has(d+"")) balance += d;
+  merged = input + balance;
+
+  if (merged.length !== 10) { alert("Result must be 10 digits."); return; }
+
+  // show balance
+  document.getElementById("balanceDigits").textContent = 
+    "Balance digits: " + balance + " → Full number: " + merged;
+
+  // go to page2
+  goNext();
+}
+
+/* Step 2: Generate sequence */
+function generateSequence(numStr) {
+  const n = numStr.length;
+  const original = numStr.split('');
+  const last = original[n-1];
+  const withoutLast = original.slice(0, n-1);
+  const results = [];
+  for (let i = 0; i < n; i++) {
+    const insertIndex = (n - 1) - i;
+    const arr = withoutLast.slice();
+    arr.splice(insertIndex, 0, last);
+    results.push(arr.join(''));
+  }
+  return results;
+}
+
+function splitPairs(s) {
+  const pairs = [];
+  for (let i=0; i<s.length; i+=2) pairs.push(s.substring(i,i+2));
+  return pairs;
+}
+
+/* Page navigation */
+function goNext() {
+  const seq = generateSequence(merged);
+  allPairs = [];
+  seq.forEach(item => allPairs = allPairs.concat(splitPairs(item)));
+  currentPage = 0;
+  renderPage();
+  document.getElementById("page1").style.display="none";
+  document.getElementById("page2").style.display="block";
+}
+
+function goBack() {
+  document.getElementById("page2").style.display="none";
+  document.getElementById("page1").style.display="block";
+}
+
+function renderPage() {
+  document.getElementById("mergedNumber").textContent = merged;
+  const gridContainer = document.getElementById("gridContainer");
+  gridContainer.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className="grid";
+  const startIdx = currentPage*pageSize;
+  const pagePairs = allPairs.slice(startIdx, startIdx+pageSize);
+  for (let r=0; r<10; r++) {
+    for (let c=0; c<3; c++) {
+      const idx = r*3+c;
+      const value = pagePairs[idx] || "";
+      const cell = document.createElement("div");
+      cell.className="cell";
+      cell.textContent = value;
+      grid.appendChild(cell);
+    }
+  }
+  gridContainer.appendChild(grid);
+
+  // pager
+  const pager = document.getElementById("pager");
+  pager.innerHTML="";
+  const totalPages = Math.max(1, Math.ceil(allPairs.length/pageSize));
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent="⬅ Previous"; prevBtn.className="btn-nav";
+  prevBtn.disabled = currentPage===0;
+  prevBtn.onclick = ()=>{ if(currentPage>0){currentPage--;renderPage();}};
+  pager.appendChild(prevBtn);
+
+  pager.append(" Page "+(currentPage+1)+" / "+totalPages+" ");
+
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent="Next ➡"; nextBtn.className="btn-nav";
+  nextBtn.disabled = (currentPage+1)*pageSize >= allPairs.length;
+  nextBtn.onclick = ()=>{ if((currentPage+1)*pageSize<allPairs.length){currentPage++;renderPage();}};
+  pager.appendChild(nextBtn);
+}
+
+function resetAll(){
+  document.getElementById("startInput").value="";
+  document.getElementById("balanceDigits").textContent="";
+  goBack();
+}
+</script>
+</body>
+</html>

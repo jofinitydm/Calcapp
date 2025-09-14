@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maths App Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+    }
+    h2 {
+      margin: 20px 0;
+    }
+    .container {
+      background: #fff;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      text-align: center;
+    }
+    input[readonly] {
+      background-color: #f0f0f0;
+      color: #555;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+    }
+    .submit {
+      background: #007bff;
+    }
+    .reset {
+      background: #dc3545;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 20px;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Maths App Calculator</h2>
+
+    <!-- First Input (User Entered) -->
+    <input type="text" id="input1" placeholder="Enter digits" oninput="autoFill()">
+
+    <br>
+    <span style="font-size:24px; color:green;">+</span>
+    <br>
+
+    <!-- Second Input (Auto-Filled and Visible) -->
+    <input type="text" id="input2" placeholder="Auto Filled" readonly>
+
+    <br>
+    <button class="btn submit" onclick="calculate()">Submit</button>
+    <button class="btn reset" onclick="resetForm()">Reset</button>
+
+    <h3 id="result"></h3>
+  </div>
+
+<script>
+  function autoFill() {
+    let allDigits = "0123456789";
+    let firstInput = document.getElementById("input1").value;
+
+    // Remove non-digits and duplicates
+    let cleaned = "";
+    for (let digit of firstInput) {
+      if (allDigits.includes(digit) && !cleaned.includes(digit)) {
+        cleaned += digit;
+      }
+    }
+
+    document.getElementById("input1").value = cleaned;
+
+    // Remaining digits
+    let remaining = "";
+    for (let digit of allDigits) {
+      if (!cleaned.includes(digit)) {
+        remaining += digit;
+      }
+    }
+
+    document.getElementById("input2").value = remaining;
+  }
+
+  function calculate() {
+    let num1 = parseInt(document.getElementById("input1").value) || 0;
+    let num2 = parseInt(document.getElementById("input2").value) || 0;
+    let sum = num1 + num2;
+    document.getElementById("result").innerText = "Result: " + sum;
+  }
+
+  function resetForm() {
+    document.getElementById("input1").value = "";
+    document.getElementById("input2").value = "";
+    document.getElementById("result").innerText = "";
+  }
+</script>
+
+</body>
+</html>

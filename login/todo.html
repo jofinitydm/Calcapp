@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>10-Digit Order Grid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      border: 1px solid #333;
+      padding: 10px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    button {
+      margin: 10px;
+      padding: 8px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>10-Digit Order Grid</h2>
+
+  <input type="text" id="inputNumber" maxlength="10" placeholder="Enter 10-digit number">
+  <button onclick="generateOrders()">Submit</button>
+
+  <div id="grid" class="grid"></div>
+
+  <button onclick="prevOrder()">Previous</button>
+  <button onclick="nextOrder()">Next</button>
+
+  <script>
+    let orders = [];
+    let currentIndex = 0;
+
+    function generateOrders() {
+      const num = document.getElementById("inputNumber").value;
+      if (num.length !== 10 || isNaN(num)) {
+        alert("Please enter a valid 10-digit number.");
+        return;
+      }
+
+      // Fixed 10 permutations from your example
+      orders = [
+        num,
+        num.slice(0,8) + num[9] + num[8], // swap last 2
+        num.slice(0,6) + num[7] + num[6] + num.slice(8),
+        num.slice(0,5) + num[7] + num[6] + num.slice(8),
+        num.slice(0,4) + num[6] + num[5] + num.slice(7),
+        num.slice(0,4) + num[8] + num[5] + num.slice(7),
+        num.slice(0,2) + num[5] + num[4] + num.slice(6),
+        num.slice(0,2) + num[6] + num[4] + num.slice(7),
+        num[1] + num[0] + num.slice(2), // swap first 2
+        num[9] + num.slice(0,9) // last digit first
+      ];
+
+      currentIndex = 0;
+      displayOrder();
+    }
+
+    function displayOrder() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+
+      const order = orders[currentIndex];
+      const pairs = order.match(/.{1,2}/g); // split into 2-digit chunks
+
+      pairs.forEach(p => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = p;
+        grid.appendChild(cell);
+      });
+    }
+
+    function nextOrder() {
+      if (currentIndex < orders.length - 1) {
+        currentIndex++;
+        displayOrder();
+      }
+    }
+
+    function prevOrder() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        displayOrder();
+      }
+    }
+  </script>
+</body>
+</html>
